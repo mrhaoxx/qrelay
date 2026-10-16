@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>qrelay · 发布端</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <h1><a href="/">qrelay</a> <span class="muted">发布端</span></h1>
+  <span class="status"><span id="dot" class="dot"></span><span id="conn">连接中…</span> · <span id="viewers">0</span> 人观看</span>
+</header>
+<main>
+  <div class="layout">
+    <section>
+      <div class="camera">
+        <video id="video" playsinline muted autoplay></video>
+        <canvas id="overlay"></canvas>
+        <div class="hint" id="hint">正在打开摄像头…</div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <select id="cameras" title="选择摄像头"><option value="">默认摄像头</option></select>
+        <select id="rate" title="识别频率">
+          <option value="300">低频（≈3 次/秒）</option>
+          <option value="150" selected>中频（≈6 次/秒）</option>
+          <option value="80">高频（≈12 次/秒）</option>
+        </select>
+        <button id="toggle">暂停发送</button>
+        <span id="camErr" class="muted" style="color:var(--bad)"></span>
+      </div>
+      <p class="muted" style="margin:10px 0 0">画面不会上传。发布端只上传解析出的模块矩阵和文本（几百字节）；摄像头预览仅在观看端主动请求时以 2 fps 上传。</p>
+    </section>
+    <aside style="display:grid;gap:16px;align-content:start">
+      <div class="panel">
+        <h2>观看链接</h2>
+        <div class="linkbox">
+          <input id="link" class="mono" readonly>
+          <button id="copy">复制</button>
+        </div>
+        <div class="linkqr"><img id="linkqr" alt="观看链接二维码"></div>
+        <p class="muted" style="margin:10px 0 0">对方打开链接即可观看。关闭本页会停止分享。</p>
+      </div>
+      <div class="panel">
+        <h2>当前识别内容</h2>
+        <div id="decoded" class="decoded empty">尚未识别到二维码</div>
+        <div class="linkqr"><canvas id="modules" title="解析出的模块矩阵（观看端像素模式看到的就是这个）"></canvas></div>
+      </div>
+      <div class="panel">
+        <h2>历史内容 <span id="histCount"></span></h2>
+        <ul id="history" class="hist"></ul>
+        <div id="histEmpty" class="muted">还没有记录。</div>
+        <div class="row" style="margin-top:10px">
+          <button id="clearHist">清空历史</button>
+          <a id="export" class="muted" download>导出 JSON ↓</a>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>状态</h2>
+        <div class="stats">
+          <span>画面</span><b id="stRes">-</b>
+          <span>模块矩阵</span><b id="stMod">-</b>
+          <span>识别耗时</span><b id="stDet">-</b>
+          <span>已发送消息</span><b id="stSent">0</b>
+          <span>上行速率</span><b id="stBw">-</b>
+          <span>预览上传</span><b id="stPrev">关</b>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+<div id="toast" class="toast"></div>
+<script src="/static/jsQR.js"></script>
+<script src="/static/modules.js"></script>
+<script src="/static/share.js"></script>
+</body>
+</html>

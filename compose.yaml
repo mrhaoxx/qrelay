@@ -1,0 +1,40 @@
+services:
+  qrelay:
+    build: .
+    image: ghcr.io/mrhaoxx/qrelay:latest
+    restart: unless-stopped
+    ports:
+      - "${QRELAY_PORT:-8080}:8080"
+    environment:
+      # Fixed secret keeps publisher links valid across restarts. Leave empty for a random one.
+      QRELAY_SECRET: ${QRELAY_SECRET:-}
+      QRELAY_HISTORY: ${QRELAY_HISTORY:-50}
+      # Browsers only allow camera access over HTTPS (or localhost). Options:
+      #   1. Put the `tls` profile below (Caddy + Let's Encrypt) in front: docker compose --profile tls up -d
+      #   2. Mount your own cert:  QRELAY_CERT=/certs/fullchain.pem  QRELAY_KEY=/certs/privkey.pem
+      #   3. LAN testing only:     QRELAY_SELF_SIGNED=1
+      QRELAY_SELF_SIGNED: ${QRELAY_SELF_SIGNED:-}
+      QRELAY_CERT: ${QRELAY_CERT:-}
+      QRELAY_KEY: ${QRELAY_KEY:-}
+    # volumes:
+    #   - ./certs:/certs:ro
+
+  # Optional: automatic HTTPS with a real domain pointing at this host.
+  #   DOMAIN=qr.example.com docker compose --profile tls up -d
+  caddy:
+    image: caddy:2
+    profiles: ["tls"]
+    restart: unless-stopped
+    depends_on:
+      - qrelay
+    ports:
+      - "80:80"
+      - "443:443"
+    command: caddy reverse-proxy --from ${DOMAIN:-localhost} --to qrelay:8080
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

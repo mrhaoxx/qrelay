@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>qrelay · 实时二维码分享</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <h1><a href="/">qrelay</a></h1>
+  <span class="muted">摄像头里的二维码，实时分享给任何人</span>
+</header>
+<main>
+  <section class="hero">
+    <h2>把镜头对准二维码，别人凭链接即可看到</h2>
+    <p>发布端在浏览器里识别并裁出二维码区域，观看端可以在「像素 1:1 复刻」与「重新解析」两种显示方式之间切换。</p>
+    <button id="start" class="primary" style="font-size:17px;padding:12px 28px">开始分享</button>
+    <p id="err" class="muted" style="color:var(--bad);display:none"></p>
+  </section>
+  <section class="features">
+    <div class="panel"><h3>像素 1:1 复刻</h3><p>观看端显示摄像头实际捕获的二维码区域，无损 PNG 传输，按整数倍放大，不做任何重绘。</p></div>
+    <div class="panel"><h3>重新解析</h3><p>服务端根据解码出的内容重新生成一张干净的标准二维码，适合原图模糊、倾斜或有反光的情况。</p></div>
+    <div class="panel"><h3>仅凭链接</h3><p>无需登录。发布端拿到的观看链接可以直接发给别人，或让对方扫描页面上的链接二维码。</p></div>
+  </section>
+  <section class="panel">
+    <h2>已有观看链接？</h2>
+    <form id="join" class="row">
+      <input id="room" class="grow mono" placeholder="粘贴观看链接或房间号" autocomplete="off">
+      <button type="submit">观看</button>
+    </form>
+  </section>
+</main>
+<script>
+document.getElementById('start').onclick = async (e) => {
+  e.target.disabled = true;
+  try {
+    const r = await fetch('/api/rooms', { method: 'POST' });
+    if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+    const j = await r.json();
+    location.href = j.share;
+  } catch (err) {
+    const el = document.getElementById('err');
+    el.textContent = '创建房间失败：' + err.message; el.style.display = 'block';
+    e.target.disabled = false;
+  }
+};
+document.getElementById('join').onsubmit = (e) => {
+  e.preventDefault();
+  let v = document.getElementById('room').value.trim();
+  const m = v.match(/\/watch\/([a-z2-7]+)/i) || v.match(/^([a-z2-7]{8,16})$/i);
+  if (!m) { alert('无法识别的链接或房间号'); return; }
+  location.href = '/watch/' + m[1].toLowerCase();
+};
+</script>
+</body>
+</html>

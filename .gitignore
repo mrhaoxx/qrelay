@@ -1,0 +1,13 @@
+# build output
+/qrelay
+/qrelay.exe
+/dist/
+
+# local config and secrets
+.env
+certs/
+
+# test fixtures / scratch
+*.y4m
+*.log
+.DS_Store

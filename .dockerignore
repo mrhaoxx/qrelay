@@ -1,0 +1,12 @@
+.git
+.gitignore
+Dockerfile
+compose.yaml
+.dockerignore
+README.md
+qrelay
+*.y4m
+*.png
+.env
+certs/
+.github

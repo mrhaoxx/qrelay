@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>qrelay · 观看</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <h1><a href="/">qrelay</a> <span class="muted">观看</span></h1>
+  <span class="status"><span id="dot" class="dot"></span><span id="conn">连接中…</span> · <span id="viewers">0</span> 人观看</span>
+</header>
+<main>
+  <div class="layout">
+    <section style="display:grid;gap:12px;align-content:start">
+      <div class="row">
+        <div class="modes">
+          <button id="modePixel" data-mode="pixel" title="按发布端解析出的模块矩阵逐格 1:1 重绘">像素 1:1 复刻</button>
+          <button id="modeReparse" data-mode="reparse" title="按解码内容重新生成的标准二维码">重新解析</button>
+        </div>
+        <select id="scale" title="每个模块的像素大小">
+          <option value="fit" selected>自动大小</option>
+          <option value="4">4 px/模块</option>
+          <option value="8">8 px/模块</option>
+          <option value="12">12 px/模块</option>
+          <option value="16">16 px/模块</option>
+        </select>
+        <button id="freeze">冻结画面</button>
+        <button id="live" class="primary" hidden>返回实时</button>
+        <span id="age" class="muted"></span>
+      </div>
+      <div id="stage" class="stage">
+        <div class="placeholder" id="placeholder">等待发布端…</div>
+        <canvas id="pixel" hidden></canvas>
+        <img id="reparse" hidden alt="重新生成的二维码">
+        <span id="badge" class="badge" hidden></span>
+      </div>
+    </section>
+    <aside style="display:grid;gap:16px;align-content:start">
+      <div class="panel">
+        <h2>解码内容</h2>
+        <div id="text" class="textbox empty">尚未识别到二维码</div>
+        <div class="row" style="margin-top:10px">
+          <button id="copy" disabled>复制</button>
+          <a id="open" class="muted" target="_blank" rel="noopener" hidden>打开链接 ↗</a>
+        </div>
+        <p id="meta" class="muted" style="margin:10px 0 0"></p>
+        <p id="qrErr" class="muted" style="color:var(--warn);display:none"></p>
+      </div>
+      <div class="panel">
+        <h2>摄像头画面</h2>
+        <label class="row" style="margin-bottom:10px;cursor:pointer"><input type="checkbox" id="wantPreview" style="width:auto;padding:0"> 接收摄像头预览（2 fps，约 10 KB/s）</label>
+        <img id="preview" class="preview" alt="发布端摄像头预览" hidden>
+        <div id="previewOff" class="muted">未开启。发布端默认不上传画面。</div>
+      </div>
+      <div class="panel">
+        <h2>历史内容 <span id="histCount"></span></h2>
+        <ul id="history" class="hist"></ul>
+        <div id="histEmpty" class="muted">还没有记录。每出现一个新的内容就会记在这里，点一条可回看。</div>
+        <div class="row" style="margin-top:10px"><a id="export" class="muted" download>导出 JSON ↓</a></div>
+      </div>
+      <div class="panel">
+        <h2>说明</h2>
+        <p class="muted" style="margin:0"><b>像素 1:1 复刻</b>：发布端在浏览器里把摄像头中的二维码解析成模块矩阵（每个黑白格），这里逐格重绘，和镜头里采样到的一模一样，包括可能的误读格。<br><br>
+        <b>重新解析</b>：服务端根据解码出的文本重新生成一张干净的标准二维码，内容一致。</p>
+      </div>
+    </aside>
+  </div>
+</main>
+<div id="toast" class="toast"></div>
+<script src="/static/modules.js"></script>
+<script src="/static/watch.js"></script>
+</body>
+</html>
